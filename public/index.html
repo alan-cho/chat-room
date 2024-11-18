@@ -7,9 +7,23 @@
   </head>
   <body>
     <h1>Hello World</h1>
+    <form class="chatForm">
+      <input type="text" class="inputField" />
+      <button type="submit">Enter</button>
+    </form>
     <script src="/socket.io/socket.io.js"></script>
     <script>
       const socket = io();
+      const form = document.querySelector(".chatForm");
+      const input = document.querySelector(".inputField");
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (input.value) {
+          socket.emit("chat message", input.value);
+          input.value = "";
+        }
+      });
     </script>
   </body>
 </html>
