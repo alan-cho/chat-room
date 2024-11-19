@@ -1,6 +1,6 @@
 import { Schema, Document, model } from "mongoose";
 
-interface IMessage extends Document {
+export interface IMessage extends Document {
   text: string;
   createdAt: Date;
 }

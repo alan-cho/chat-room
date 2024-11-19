@@ -6,7 +6,7 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 
-import Message from "./models/Message.js";
+import initSockets from "./sockets.js";
 
 const app = express();
 const server = createServer(app);
@@ -21,54 +21,10 @@ app.use(express.static(frontendPath));
 app.use(cors());
 app.use(express.json());
 
+initSockets(io);
+
 app.get("/", (req, res) => {
   res.sendFile(path.join(frontendPath, "index.html"));
-});
-
-app.get("/messages", async (req, res) => {
-  try {
-    const messages = await Message.find({});
-    res.json(messages);
-  } catch (error) {
-    res.status(500).json({ error: "Failed Retrieving Message" });
-  }
-});
-
-io.on("connection", (socket) => {
-  // Event: User Connected
-  (async () => {
-    try {
-      console.log("User Connected");
-      const messages = await Message.find({});
-      socket.emit("allMessages", messages);
-    } catch (error) {
-      console.error("Error Retrieving Messages: ", error);
-    }
-  })();
-
-  // Event: User Disconnected
-  socket.on("disconnect", () => {
-    console.log("User Disconnected");
-  });
-
-  // Event: Add Message to Database
-  socket.on("chatMessage", async (message: string) => {
-    try {
-      const newMessage = new Message({ text: message });
-      await newMessage.save();
-    } catch (error) {
-      console.error("Failed Saving Message: ", error);
-    }
-  });
-
-  // Event: Clear Messages from Database
-  socket.on("clearDatabase", async () => {
-    try {
-      await Message.deleteMany({});
-    } catch (error) {
-      console.error("Failed Deleting Messages: ", error);
-    }
-  });
 });
 
 async function startServer() {
@@ -86,5 +42,3 @@ async function startServer() {
 }
 
 startServer();
-
-export default io;

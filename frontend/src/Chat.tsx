@@ -12,31 +12,33 @@ function Chat({ socket }: ChatProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    socket.on("allMessages", (messages: Message[]) => {
-      setMessages(messages);
-    });
+    const handleGetAllMessages = (messages: Message[]) => setMessages(messages);
+    const handleAddMessage = (message: Message) =>
+      setMessages((prevMessages) => [...prevMessages, message]);
+    const handleClearDatabase = () => setMessages([]);
+
+    socket.on("handleGetAllMessages", handleGetAllMessages);
+    socket.on("handleAddMessage", handleAddMessage);
+    socket.on("handleClearDatabase", handleClearDatabase);
 
     return () => {
-      socket.off("allMessages");
+      socket.off("handleGetAllMessages", handleGetAllMessages);
+      socket.off("handleAddMessage", handleAddMessage);
+      socket.off("handleClearDatabase", handleClearDatabase);
     };
   }, [socket]);
 
   function handleSubmit(e: FormEvent): void {
     e.preventDefault();
 
-    if (inputRef.current && inputRef.current.value) {
-      const message: Message = {
-        id: Date.now(),
-        text: inputRef.current.value,
-      };
-      socket.emit("chatMessage", message.text);
-      setMessages((prevMessages) => [...prevMessages, message]);
+    if (inputRef.current && inputRef.current.value.trim()) {
+      const message = inputRef.current.value.trim();
+      socket.emit("addMessage", message);
       inputRef.current.value = "";
     }
   }
 
   function clearDatabase(): void {
-    setMessages([]);
     socket.emit("clearDatabase");
   }
 
