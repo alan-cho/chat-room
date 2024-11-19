@@ -51,13 +51,22 @@ io.on("connection", (socket) => {
     console.log("User Disconnected");
   });
 
-  // Event: Message Emitted
+  // Event: Add Message to Database
   socket.on("chatMessage", async (message: string) => {
     try {
       const newMessage = new Message({ text: message });
       await newMessage.save();
     } catch (error) {
       console.error("Failed Saving Message: ", error);
+    }
+  });
+
+  // Event: Clear Messages from Database
+  socket.on("clearDatabase", async () => {
+    try {
+      await Message.deleteMany({});
+    } catch (error) {
+      console.error("Failed Deleting Messages: ", error);
     }
   });
 });

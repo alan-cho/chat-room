@@ -35,6 +35,11 @@ function Chat({ socket }: ChatProps) {
     }
   }
 
+  function clearDatabase(): void {
+    setMessages([]);
+    socket.emit("clearDatabase");
+  }
+
   return (
     <div className="chat">
       <Chatlog messages={messages} />
@@ -42,6 +47,7 @@ function Chat({ socket }: ChatProps) {
         <input type="text" ref={inputRef} />
         <button type="submit">Enter</button>
       </form>
+      <button onClick={clearDatabase}>Clear</button>
     </div>
   );
 }
