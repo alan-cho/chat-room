@@ -1,9 +1,5 @@
 import React from "react";
-
-interface Message {
-  id: number;
-  text: string;
-}
+import Message from "./types/Message";
 
 interface ChatlogProps {
   messages: Message[];

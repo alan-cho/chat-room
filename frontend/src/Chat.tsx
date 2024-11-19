@@ -1,19 +1,25 @@
 import React, { useRef, useState, useEffect, FormEvent } from "react";
-import Chatlog from "./Chatlog";
 import { Socket } from "socket.io-client";
+import Chatlog from "./Chatlog";
+import Message from "./types/Message";
 
 interface ChatProps {
   socket: typeof Socket;
 }
 
-interface Message {
-  id: number;
-  text: string;
-}
-
 function Chat({ socket }: ChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    socket.on("allMessages", (messages: Message[]) => {
+      setMessages(messages);
+    });
+
+    return () => {
+      socket.off("allMessages");
+    };
+  }, [socket]);
 
   function handleSubmit(e: FormEvent): void {
     e.preventDefault();
@@ -28,19 +34,6 @@ function Chat({ socket }: ChatProps) {
       inputRef.current.value = "";
     }
   }
-
-  useEffect(() => {
-    socket.on("chatMessage", (message: string) => {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { id: Date.now(), text: message },
-      ]);
-    });
-
-    return () => {
-      socket.off("chatMessage");
-    };
-  }, [socket]);
 
   return (
     <div className="chat">

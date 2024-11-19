@@ -1,9 +1,12 @@
 import express from "express";
+import mongoose from "mongoose";
+import { Server } from "socket.io";
+import { createServer } from "http";
+import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
-import { createServer } from "http";
-import { Server } from "socket.io";
-import cors from "cors";
+
+import Message from "./models/Message.js";
 
 const app = express();
 const server = createServer(app);
@@ -16,23 +19,63 @@ const frontendPath = path.join(__dirname, "../../frontend/build");
 
 app.use(express.static(frontendPath));
 app.use(cors());
+app.use(express.json());
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(frontendPath, "index.html"));
 });
 
-io.on("connection", (socket) => {
-  console.log("User Connected");
+app.get("/messages", async (req, res) => {
+  try {
+    const messages = await Message.find({});
+    res.json(messages);
+  } catch (error) {
+    res.status(500).json({ error: "Failed Retrieving Message" });
+  }
+});
 
+io.on("connection", (socket) => {
+  // Event: User Connected
+  (async () => {
+    try {
+      console.log("User Connected");
+      const messages = await Message.find({});
+      socket.emit("allMessages", messages);
+    } catch (error) {
+      console.error("Error Retrieving Messages: ", error);
+    }
+  })();
+
+  // Event: User Disconnected
   socket.on("disconnect", () => {
     console.log("User Disconnected");
   });
 
-  socket.on("chatMessage", (msg) => {
-    console.log("Message: " + msg);
+  // Event: Message Emitted
+  socket.on("chatMessage", async (message: string) => {
+    try {
+      const newMessage = new Message({ text: message });
+      await newMessage.save();
+    } catch (error) {
+      console.error("Failed Saving Message: ", error);
+    }
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+async function startServer() {
+  try {
+    await mongoose
+      .connect("mongodb://localhost/chat-app")
+      .then(() => console.log("MongoDB Connected"));
+
+    server.listen(PORT, () => {
+      console.log("Server Instantiated");
+    });
+  } catch (error) {
+    console.error("Failed MonogoDB Connection: ", error);
+  }
+}
+
+startServer();
+
+export default io;
