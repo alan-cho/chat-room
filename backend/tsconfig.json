@@ -6,6 +6,7 @@
     "esModuleInterop": true, // Enable ESModule interoperability
     "skipLibCheck": true, // Skip checking lib files to improve compilation time
     "outDir": "./dist", // Output compiled files to the 'dist' directory
+    "rootDir": "./src",
     "strict": true, // Enable strict type checking options
     "forceConsistentCasingInFileNames": true, // Ensure consistent file naming
     "resolveJsonModule": true, // Allow importing JSON files
@@ -14,5 +15,8 @@
     "declarationDir": "./dist/types"
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "ts-node": {
+    "esm": true
+  }
 }

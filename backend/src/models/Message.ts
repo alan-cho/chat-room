@@ -10,6 +10,4 @@ const messageSchema = new Schema<IMessage>({
   createdAt: { type: Date, default: Date.now },
 });
 
-const Message = model<IMessage>("Message", messageSchema);
-
-export default Message;
+export const Message = model<IMessage>("Message", messageSchema);

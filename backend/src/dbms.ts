@@ -1,4 +1,4 @@
-import Message, { IMessage } from "./models/Message.js";
+import { Message, IMessage } from "./models/Message.js";
 
 async function getAllMessages(): Promise<IMessage[]> {
   try {
