@@ -33,5 +33,10 @@ export default function initSockets(io: Server): void {
       await dbms.deleteAllMessages();
       io.emit("handleClearDatabase");
     });
+
+    // Event: User Drawing
+    socket.on("draw", (data) => {
+      socket.broadcast.emit("draw", data);
+    });
   });
 }

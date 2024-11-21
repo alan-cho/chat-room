@@ -1,6 +1,17 @@
 import React, { useRef, useEffect, useState } from "react";
+import { Socket } from "socket.io-client";
 
-export default function Canvas() {
+interface CanvasProps {
+  socket: typeof Socket;
+}
+
+interface CanvasEvent {
+  type: string;
+  x: number;
+  y: number;
+}
+
+export default function Canvas({ socket }: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
 
@@ -15,6 +26,7 @@ export default function Canvas() {
       context.beginPath();
       context.moveTo(offsetX, offsetY);
       setIsDrawing(true);
+      socket.emit("draw", { type: "start", x: offsetX, y: offsetY });
     };
 
     const stopDrawing = () => {
@@ -22,6 +34,7 @@ export default function Canvas() {
         context.closePath();
         setIsDrawing(false);
       }
+      socket.emit("draw", { type: "stop" });
     };
 
     const draw = (event: MouseEvent) => {
@@ -30,7 +43,20 @@ export default function Canvas() {
       const { offsetX, offsetY } = event;
       context.lineTo(offsetX, offsetY);
       context.stroke();
+      socket.emit("draw", { type: "draw", x: offsetX, y: offsetY });
     };
+
+    socket.on("draw", (data: CanvasEvent) => {
+      if (data.type === "start") {
+        context.beginPath();
+        context.moveTo(data.x, data.y);
+      } else if (data.type === "draw") {
+        context.lineTo(data.x, data.y);
+        context.stroke();
+      } else if (data.type === "stop") {
+        context.closePath();
+      }
+    });
 
     canvas?.addEventListener("mousedown", startDrawing);
     canvas?.addEventListener("mousemove", draw);
@@ -44,8 +70,6 @@ export default function Canvas() {
       canvas?.removeEventListener("mouseleave", stopDrawing);
     };
   }, [isDrawing]);
-
-  function draw(context: CanvasRenderingContext2D, frameCount: number) {}
 
   return (
     <canvas
