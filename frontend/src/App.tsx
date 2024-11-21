@@ -1,6 +1,7 @@
 import React from "react";
-import Chat from "./Chat";
 import io, { Socket } from "socket.io-client";
+import Chat from "./Chat";
+import Canvas from "./Canvas";
 
 function App() {
   const socket: typeof Socket = io("http://localhost:3000"); // Initialize the socket
@@ -9,6 +10,7 @@ function App() {
     <div>
       <h1>Welcome to the Chatroom</h1>
       <Chat socket={socket} />
+      <Canvas />
     </div>
   );
 }
