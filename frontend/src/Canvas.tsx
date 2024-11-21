@@ -74,8 +74,9 @@ export default function Canvas({ socket }: CanvasProps) {
   return (
     <canvas
       ref={canvasRef}
-      width="400"
-      height="400"
+      className=""
+      width="500"
+      height="500"
       style={{ border: "1px solid black", cursor: "crosshair" }}
     ></canvas>
   );

@@ -1,4 +1,4 @@
 export default interface Message {
-  id: number;
+  _id: string;
   text: string;
 }

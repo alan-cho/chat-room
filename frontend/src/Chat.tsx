@@ -12,7 +12,9 @@ function Chat({ socket }: ChatProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const handleGetAllMessages = (messages: Message[]) => setMessages(messages);
+    const handleGetAllMessages = (messages: Message[]) => {
+      setMessages(messages);
+    };
     const handleAddMessage = (message: Message) =>
       setMessages((prevMessages) => [...prevMessages, message]);
     const handleClearDatabase = () => setMessages([]);
@@ -43,7 +45,7 @@ function Chat({ socket }: ChatProps) {
   }
 
   return (
-    <div className="chat">
+    <div className="chat basis-1/4 border-2 border-black">
       <Chatlog messages={messages} />
       <form className="chatInput" onSubmit={handleSubmit}>
         <input type="text" ref={inputRef} />

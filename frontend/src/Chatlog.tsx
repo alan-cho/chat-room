@@ -9,7 +9,7 @@ function Chatlog({ messages }: ChatlogProps) {
   return (
     <div className="chatLog">
       {messages.map((message) => (
-        <div key={message.id} className="message">
+        <div key={message._id} className="message">
           <p>{message.text}</p>
         </div>
       ))}

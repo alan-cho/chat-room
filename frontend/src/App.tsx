@@ -7,10 +7,9 @@ function App() {
   const socket: typeof Socket = io("http://localhost:3000");
 
   return (
-    <div>
-      <h1>Welcome to the Chatroom</h1>
-      <Chat socket={socket} />
+    <div className="flex">
       <Canvas socket={socket} />
+      <Chat socket={socket} />
     </div>
   );
 }
